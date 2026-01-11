@@ -10,7 +10,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.linear_model import SGDClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
+from sklearn.metrics import f1_score, accuracy_score, confusion_matrix, classification_report
 
 # 1. Download Dataset
 print("Downloading dataset...")
@@ -38,6 +38,8 @@ def prepare_data(limit=300):
             img = cv2.imread(os.path.join(folder, filename))
 
             if img is not None:
+
+                # Data Preprocessing
                 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
                 resized = cv2.resize(gray, (64, 128))
                 features = hog.compute(resized)
@@ -80,24 +82,38 @@ models = {'Linear SVM': model_svm, 'Decision Tree': model_tree, 'Random Forest':
 
 def evaluate_model(): 
 
+    results_dict = {}
+
     for name, model in models.items(): 
 
         print(f"\n{name}")
         y_pred = model.predict(x_test)
 
-        print("Accuracy:", accuracy_score(y_test, y_pred))
+        accuracy = accuracy_score(y_test, y_pred)
+        f1score = f1_score(y_test, y_pred)
+
+        # 2. Store scores in the dictionary
+        results_dict[name] = {
+            'Accuracy': accuracy,
+            'F1': f1score
+        }
+
+        print("Accuracy:", accuracy)
         print("Confusion Matrix:\n", confusion_matrix(y_test, y_pred))
         print("Classification Report:\n", classification_report(y_test, y_pred))
 
-def comparison_bar_graph():
-    """
-    Generates and saves a bar graph comparing models.
-    results_dict format: {'SVM': {'F1': 0.85, 'ROC': 0.88}, ...}
-    """
+    return results_dict
 
+
+def comparison_bar_graph(results_dict):
+    """
+    Generates a bar graph comparing Accuracy and F1-Score.
+    results_dict should look like: 
+    {'SVM': {'Accuracy': 0.88, 'F1': 0.85}, 'Decision Tree': {...}, 'Random Forest': {...}}
+    """
     model_names = list(results_dict.keys())
+    accuracy_scores = [results_dict[m]['Accuracy'] for m in model_names]
     f1_scores = [results_dict[m]['F1'] for m in model_names]
-    roc_scores = [results_dict[m]['ROC'] for m in model_names]
 
     x = np.arange(len(model_names))  # Label locations
     width = 0.35  # Width of the bars
@@ -105,24 +121,24 @@ def comparison_bar_graph():
     fig, ax = plt.subplots(figsize=(10, 6))
     
     # Create the bars
-    rects1 = ax.bar(x - width/2, f1_scores, width, label='F1 Score', color='#3498db')
-    rects2 = ax.bar(x + width/2, roc_scores, width, label='ROC AUC', color='#e74c3c')
+    rects1 = ax.bar(x - width/2, accuracy_scores, width, label='Accuracy', color='#2ecc71')
+    rects2 = ax.bar(x + width/2, f1_scores, width, label='F1-Score', color='#3498db')
 
-    # Add text for labels, title and custom x-axis tick labels
-    ax.set_ylabel('Score (0.0 - 1.0)')
-    ax.set_title('Performance Comparison: SVM vs Decision Tree vs Random Forest')
+    # Formatting
+    ax.set_ylabel('Score Value')
+    ax.set_title('Model Evaluation Comparison: Accuracy vs F1-Score')
     ax.set_xticks(x)
     ax.set_xticklabels(model_names)
     ax.legend()
-    ax.set_ylim(0, 1.1)  # Give some space at the top for labels
+    ax.set_ylim(0, 1.1)
 
-    # Attach a text label above each bar in *rects*, displaying its height.
+    # Function to add value labels on top of bars
     def autolabel(rects):
         for rect in rects:
             height = rect.get_height()
             ax.annotate(f'{height:.2f}',
                         xy=(rect.get_x() + rect.get_width() / 2, height),
-                        xytext=(0, 3),  # 3 points vertical offset
+                        xytext=(0, 3), 
                         textcoords="offset points",
                         ha='center', va='bottom')
 
@@ -131,11 +147,11 @@ def comparison_bar_graph():
 
     fig.tight_layout()
     
-    # Save the result as a picture for your report
-    plt.savefig('model_comparison_results.png')
-    print("Graph saved as 'model_comparison_results.png'")
+    # Save the chart as a picture for your report
+    plt.savefig('evaluation_comparison.png')
+    print("Graph saved as 'evaluation_comparison.png'")
     plt.show()
-    # Generate a bar graph and download it into a directory.
 
 
-evaluate_model()
+result = evaluate_model()
+comparison_bar_graph(result)
