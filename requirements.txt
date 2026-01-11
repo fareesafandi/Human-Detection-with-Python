@@ -3,9 +3,6 @@ opencv-python          # For webcam access and image manipulation
 Pillow                 # For converting OpenCV images to Tkinter format
 numpy                  # For mathematical operations on image arrays
 
-# ML Models
-# Note: HOG + SVM is built directly into opencv-python
-
 # Benchmarking and Reporting
 pandas                 # To create the comparison table for your report
 matplotlib             # To generate the accuracy/speed charts

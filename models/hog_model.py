@@ -1,1 +1,0 @@
-# Class for HOG + SVM trained models, include a method to predict the data.
