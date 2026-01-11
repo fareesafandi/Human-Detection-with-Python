@@ -39,7 +39,7 @@ class HumanDetectionApp:
         tk.Label(self.mid_frame, text="Select Model:").pack(side="left", padx=5)
         self.model_choice = tk.StringVar(value="hog_svm")
         self.dropdown = ttk.Combobox(self.mid_frame, textvariable=self.model_choice)
-        self.dropdown['values'] = ("hog_svm", "decision_tree", "sgd_model")
+        self.dropdown['values'] = ("hog_svm", "decision_tree", "random_forest")
         self.dropdown.pack(side="left", padx=5)
 
         self.btn_predict = tk.Button(self.mid_frame, text="RUN PREDICTION", command=self.predict, 
