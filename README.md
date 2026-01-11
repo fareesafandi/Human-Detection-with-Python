@@ -19,3 +19,15 @@ python -m venv venv
 ```Bash
 pip install -r requirements.txt
 ```
+
+### 4. Run the application
+Train 3 Models and store them in Joblib
+```bash
+python train_models.py
+```
+
+Run the application
+
+```bash
+python main2.py 
+```
