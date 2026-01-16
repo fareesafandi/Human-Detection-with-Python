@@ -12,7 +12,22 @@ class HumanDetectionApp:
 
         # Initialize Webcam and HOG
         self.cap = cv2.VideoCapture(0)
-        self.hog = cv2.HOGDescriptor((64,128), (32,32), (16,16), (32,32), 9)
+        
+        # HOG initialization with updated parameters
+        winSize = (64,128)
+        blockSize = (16,16)
+        blockStride = (8,8)
+        cellSize = (8,8)
+        nbins = 9
+        derivAperture = 1
+        winSigma = 4.
+        histogramNormType = 0
+        L2HysThreshold = 2.0000000000000001e-01
+        gammaCorrection = 0
+        nlevels = 64
+        
+        self.hog = cv2.HOGDescriptor(winSize,blockSize,blockStride,cellSize,nbins,derivAperture,winSigma,
+                                    histogramNormType,L2HysThreshold,gammaCorrection,nlevels)
         
         # State variables
         self.is_using_webcam = True
@@ -96,10 +111,12 @@ class HumanDetectionApp:
             model_path = f"models/{self.model_choice.get()}.pkl"
             model = joblib.load(model_path)
 
-            # 2. Process current frame
+            # 2. Process current frame with updated preprocessing
             gray = cv2.cvtColor(self.current_frame, cv2.COLOR_BGR2GRAY)
-            resized = cv2.resize(gray, (64, 128))
-            features = self.hog.compute(resized).reshape(1, -1)
+            resized = cv2.resize(gray, (64, 128), interpolation=cv2.INTER_AREA)
+            img_eq = cv2.equalizeHist(resized)
+            img_blur = cv2.GaussianBlur(img_eq, (5, 5), 0)
+            features = self.hog.compute(img_blur).reshape(1, -1)
 
             # 3. Predict
             prediction = model.predict(features)

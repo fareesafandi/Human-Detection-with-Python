@@ -1,12 +1,7 @@
-# Core GUI and Image Processing
-opencv-python          # For webcam access and image manipulation
-Pillow                 # For converting OpenCV images to Tkinter format
-numpy                  # For mathematical operations on image arrays
-
-# Benchmarking and Reporting
-pandas                 # To create the comparison table for your report
-matplotlib             # To generate the accuracy/speed charts
-
-scikit-learn
-kagglehub
-joblib
+opencv-python>=4.5.0
+numpy>=1.19.0
+pandas>=1.2.0
+scikit-learn>=0.24.0
+kagglehub>=0.1.0
+matplotlib>=3.3.0
+joblib>=1.0.0
